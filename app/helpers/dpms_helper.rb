@@ -62,21 +62,28 @@ module DpmsHelper
 	#youngs is youngs modulus to calculate tstress
 	#the return value is a hash [tstrain pstrainvststress]
 	def tp_strain trial, youngs
-		tstrain = Array.new
 		pstrain = Hash.new
 		trial.each do |key, value| 
 			#change stress values first (y values)
 			new_value = value * (1 + key)
 			#change the strain values to tstrain values
 			new_key = Math.log(1 + key)
-			#add the tstrain values to the array
-			tstrain << new_key
 			#change the tstrain to pstrain
 			new_key = new_key - (new_value / (youngs * 1000))
 			pstrain.store(new_key, new_value)
 		end
-		return [tstrain, pstrain]
+		return pstrain
 	end	
+
+	def getTstrain trial, youngs
+		tstrain = Array.new
+		trial.each do |key, value|
+			#change the key to the tstrain
+			new_key = Math.log(1 + key)
+			tstrain << new_key
+		end
+		return tstrain
+	end
 
 	def rounder graph, precision
 		adam = Hash.new
@@ -222,21 +229,20 @@ module DpmsHelper
 
 	#make sure that all of these values make sense
 	#TODO: test the output
-	def getSystemVars stress, pstress, tstrain, hardstress, neckingpoint, gauge, fitparam, youngs
+	def getSystemVars stress, pstrain, tstrain, hardstress, neckingpoint, gauge, fitparam, youngs
 		#get the index of the last point 
 		neckindex = hardstress.length - 1
 		df = getLastPoint(pstrain)[0]
 		dn = tstrain.sort[neckindex]
-		sigma_n = pstress[neckingpoint]
+		sigma_n = pstrain[pstrain.keys.sort[neckindex]]
 		laststresspoint = getLastPoint(stress)
 		sigma_ef = laststresspoint[1]
 		eps_en = laststresspoint[0]
 		df_dn = ((E**df) * gauge) - ((E**dn) *gauge)
 		eps_f = Math.log(eps_en + 1 + (df_dn/fitparam))
 		sigma_f = sigma_ef * (eps_en + 1 + (df_dn/fitparam))
-		eps_pf = eps_f - (sigma_f/youngs)
-		return [eps_pf, neck, sigma_f, sigma_n]
-		
+		eps_pf = eps_f - (sigma_f/(youngs*1000))
+		return [eps_pf, neckingpoint, sigma_f, sigma_n]
 	end
 	#remove all points after the necking point
 	#eps_pn = x value pstrain at necking point (this is our necking point attr)
@@ -263,7 +269,7 @@ module DpmsHelper
 		#we want evenly spaced points and their corresponding swift values
 		rtn = Hash.new
 		#get the spacing for the x values 
-		spacing = (1 - firstX) / (totalpoints - currentsize)
+		spacing = (1.0 - firstX) / (totalpoints - currentsize)
 		for i in 0..(totalpoints - currentsize)
 			#create a series of equally spaced points using swift equation as y's
 			#y = k * (eps_o + x)**n

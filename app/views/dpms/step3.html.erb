@@ -7,9 +7,9 @@
 -->
 <% graph = create_hash(Rails.root.to_s.concat("/public").concat(@dpm.filename.url)) %>
 <% trial = graph[@dpm.graph_number - 1] %>
-<% new_trial = rounder(tp_strain(trial, @dpm.youngs_modulus)[1], 4) %>
-<% maxMin = getMaxMin(new_trial) %>
-<% hardstress = removePastX(new_trial, @dpm.necking_point)%>
+<% pstrain = rounder(tp_strain(trial, @dpm.youngs_modulus), 4) %>
+<% maxMin = getMaxMin(pstrain) %>
+<% hardstress = removePastX(pstrain, @dpm.necking_point)%>
 
 
 <strong>STEP 3: Hard Stress/Strain</strong>

@@ -8,19 +8,40 @@
 -->
 <% graph = create_hash(Rails.root.to_s.concat("/public").concat(@dpm.filename.url)) %>
 <% trial = graph[@dpm.graph_number - 1] %>
-<% new_trial = rounder(tp_strain(trial, @dpm.youngs_modulus)[1], 4) %>
-<% maxMin = getMaxMin(new_trial) %>
-<% hardstress = removePastX(new_trial, @dpm.necking_point)%>
+<% pstrain = tp_strain(trial, @dpm.youngs_modulus) %>
 
+<% tstrain = getTstrain(trial, @dpm.youngs_modulus) %>
 
+<% hardstress = removePastX(pstrain, @dpm.necking_point) %>
 
+<% plus = (@dpm.fitting_param * (1 + (@dpm.threshold/100.0)))%>
+<% minus = (@dpm.fitting_param * (1 - (@dpm.threshold/100.0)))%>
+
+<% normal = getSystemVars(trial, pstrain, tstrain, hardstress, @dpm.necking_point, @dpm.gauge_length, @dpm.fitting_param, @dpm.youngs_modulus) %>
+<% plusfit = getSystemVars(trial, pstrain, tstrain, hardstress, @dpm.necking_point, @dpm.gauge_length, plus, @dpm.youngs_modulus) %>
+<% minusfit = getSystemVars(trial, pstrain, tstrain, hardstress, @dpm.necking_point, @dpm.gauge_length, minus, @dpm.youngs_modulus) %>
+
+<% swiftscos = [] %>
+<% swiftscos << getSwifts(normal[0], normal[1], normal[2], normal[3]) %>
+<% swiftscos << getSwifts(plusfit[0], plusfit[1], plusfit[2], plusfit[3]) %>
+<% swiftscos << getSwifts(minusfit[0], minusfit[1], minusfit[2], minusfit[3]) %>
+
+<% swiftgraphs = [] %>
+
+<% swiftgraphs << createSwiftPoints(@dpm.necking_point, 500, hardstress.length, swiftscos[0]) %>
+<% swiftgraphs << createSwiftPoints(@dpm.necking_point, 500, hardstress.length, swiftscos[1]) %>
+<% swiftgraphs << createSwiftPoints(@dpm.necking_point, 500, hardstress.length, swiftscos[2]) %>
+<% hardstress.delete(@dpm.necking_point)%>
+<%	finalgraphs = []%>
+<%	finalgraphs << hardstress.merge(swiftgraphs[0])%>
+<%	finalgraphs << hardstress.merge(swiftgraphs[1])%>
+<%	finalgraphs << hardstress.merge(swiftgraphs[2])%>
+<p>
+<%= line_chart finalgraphs.map.with_index {|ea, i| {:name => i+1, :data => ea}}, {discrete: true, library: {pointSize: 0, title: "Hardening Curve"}} %>
+</p>
 
 
 <strong>STEP 4:Filename:</strong>
-<p>
-<%= line_chart graph.map.with_index {|ea, i| {:name => i+1, :data => ea}}, {discrete: true, library: {pointSize: 0, title: "Hardening Curve"}} %>
-</p>
-
 
 
 <%= link_to 'Edit', edit_dpm_path(@dpm) %> |

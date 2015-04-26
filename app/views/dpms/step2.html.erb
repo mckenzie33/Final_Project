@@ -7,12 +7,13 @@
 <% graph = create_hash(Rails.root.to_s.concat("/public").concat(@dpm.filename.url)) %>
 <% trial = Marshal.load(Marshal.dump(graph[@dpm.graph_number - 1])) %>
 <% graph = []%>
-<% new_trial = rounder(tp_strain(trial, @dpm.youngs_modulus)[1], 4) %>
-<% maxMin = getMaxMin(new_trial) %>
-<% derivative = deriv(new_trial) %>
-<% graph << new_trial %>
-<% graph << derivative %>
-<% intersections = intersection(new_trial, derivative, 0.2)%>
+<% pstrain = tp_strain(trial, @dpm.youngs_modulus) %>
+
+<% maxMin = getMaxMin(pstrain) %>
+<% derivative = deriv(pstrain) %>
+<% graph << rounder(pstrain, 4) %>
+<% graph << rounder(derivative, 4) %>
+<% intersections = intersection(pstrain, derivative, 0.2)%>
 <strong>STEP 2: Choose a Necking Point</strong>
 <p>
 <%= line_chart graph.map.with_index {|ea, i| {:name => i+1, :data => ea}}, {discrete: true, library: {pointSize: 0, title: "Tstress vs. Pstrain", vAxis: { viewWindow:{ max:maxMin[0]*1.1, min:maxMin[1]}}}}%>
