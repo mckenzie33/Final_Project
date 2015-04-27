@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150420132539) do
+ActiveRecord::Schema.define(version: 20150427154057) do
 
   create_table "dpms", force: true do |t|
     t.datetime "created_at"
@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(version: 20150420132539) do
     t.float    "necking_point"
     t.float    "fitting_param"
     t.integer  "threshold"
+    t.string   "output_file"
   end
 
   create_table "materials", force: true do |t|

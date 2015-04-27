@@ -230,6 +230,9 @@ module DpmsHelper
 	    rtn = Array.new
 	    #first get eps_o using the solver
 	    eps_o = solve(epsPF, epsPN, sigF, sigN)
+	    if eps_o == nil
+	    	return nil
+	    end
 	    rtn << eps_o
 	    #back solve for n
 	    n = eps_o + epsPN

@@ -1,5 +1,5 @@
 class DpmsController < ApplicationController
-  before_action :set_dpm, only: [:show, :edit, :update, :destroy, :step1, :step2, :step3, :step4]
+  before_action :set_dpm, only: [:show, :edit, :update, :destroy, :step1, :step2, :step3, :step4, :step5]
   helper DpmsHelper
 
   # GET /dpms
@@ -45,7 +45,7 @@ class DpmsController < ApplicationController
   def update
     respond_to do |format|
       if @dpm.update(dpm_params)  
-        format.html { render '/dpms/step1', notice: 'Dpm was successfully updated.' }
+        format.html { render '/dpms/step1' }
         format.json { head :no_content }  
       else
         format.html { render action: 'edit' }
@@ -57,7 +57,7 @@ class DpmsController < ApplicationController
   def step1
     respond_to do |format|
       if @dpm.update(dpm_params)
-        format.html { render '/dpms/step2', notice: 'Change this to something else'}
+        format.html { render '/dpms/step2'}
         format.json { head :no_content }
       else
         format.html { render '/dpms/step1', notice: 'Step not saved, please retry'}
@@ -69,7 +69,7 @@ class DpmsController < ApplicationController
   def step2
     respond_to do |format|
       if @dpm.update(dpm_params)
-        format.html { render '/dpms/step3', notice: 'Change me'}
+        format.html { render '/dpms/step3'}
         format.json { head :no_content }
       else
         format.html { render '/dpms/step2', notice: 'Step not saved, please retry'}
@@ -81,7 +81,7 @@ class DpmsController < ApplicationController
   def step3
     respond_to do |format|
       if @dpm.update(dpm_params)
-        format.html { render '/dpms/step4', notice: 'Change me'}
+        format.html { render '/dpms/step4'}
         format.json { head :no_content }
       else
         format.html { render '/dpms/step3', notice: 'Step not saved, please retry'}
@@ -93,15 +93,26 @@ class DpmsController < ApplicationController
   def step4
     respond_to do |format|
       if @dpm.update(dpm_params)
-        format.html { render '/dpms/step5', notice: 'Change me'}
+        format.html { render '/dpms/step5'}
         format.json { head :no_content }
       else
-        format.html { render '/dpms/step4', notice: 'Step not saved, please retry'}
+        format.html { render '/dpms/step4', notice: 'File Output Error, please retry'}
         format.html { render json: @dpm.errors, status: :unprocessable_entity}
       end
     end
   end
 
+  def step5
+    respond_to do |format|
+      if @dpm.update(dpm_params)
+        format.html { render '/dpms/step5', notice: 'DPM Output Updated'}
+        format.json { head :no_content }
+      else
+        format.html { render '/dpms/step5', notice: 'File Output Error, please retry'}
+        format.html { render json: @dpm.errors, status: :unprocessable_entity}
+      end
+    end
+  end
 
   # DELETE /dpms/1
   # DELETE /dpms/1.json

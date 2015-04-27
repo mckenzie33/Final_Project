@@ -20,14 +20,22 @@ CapstoneHonda::Application.routes.draw do
   match '/step1', to: 'dpms#step1', via: 'patch'
   match '/step1', to: 'dpms#step1', via: 'put'
   match '/step1', to: 'dpms#step1', via: 'get'
+
   match '/step2', to: 'dpms#step2', via: 'patch'
   match '/step2', to: 'dpms#step2', via: 'put'
+  match '/step2', to: 'dpms#step2', via: 'get'
 
   match '/step3', to: 'dpms#step3', via: 'patch'
   match '/step3', to: 'dpms#step3', via: 'put'
+  match '/step3', to: 'dpms#step3', via: 'get'
 
   match '/step4', to: 'dpms#step4', via: 'patch'
   match '/step4', to: 'dpms#step4', via: 'put'
+  match '/step4', to: 'dpms#step4', via: 'get'
+
+  match '/step5', to: 'dpms#step5', via: 'patch'
+  match '/step5', to: 'dpms#step5', via: 'put'
+  match '/step5', to: 'dpms#step5', via: 'get'
 
   resources :materials do
     get :reset_filterrific, :on => :collection

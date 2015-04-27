@@ -2,21 +2,47 @@
 -create hash and get the graph number (-1) to show one graph
 -calculate Tstress, Tstrain, Pstrain 
 -get hardstress/hardstrain points
--graph hardstress/hardstrain -> pre-necking hardening curve
--get fitting paramater and threshold
+-get all values needed to solve system of equations (calculated) 
+-solve for the 3 sets of systems 
+-plot these 3 final graphs once they are calculated
 -->
+<strong>STEP 5: Finalize Output </strong>
 <% graph = create_hash(Rails.root.to_s.concat("/public").concat(@dpm.filename.url)) %>
 <% trial = graph[@dpm.graph_number - 1] %>
+<% pstrain = tp_strain(trial, @dpm.youngs_modulus) %>
 
+<% tstrain = getTstrain(trial) %>
 
+<% hardstress = removePastX(pstrain, @dpm.necking_point) %>
 
+<% plus = (@dpm.fitting_param * (1 + (@dpm.threshold/100.0)))%>
+<% minus = (@dpm.fitting_param * (1 - (@dpm.threshold/100.0)))%>
 
-<strong>STEP 5:Filename:</strong>
+<% normal = getSystemVars(trial, pstrain, tstrain, hardstress, @dpm.necking_point, @dpm.gauge_length, @dpm.fitting_param, @dpm.youngs_modulus) %>
+<% plusfit = getSystemVars(trial, pstrain, tstrain, hardstress, @dpm.necking_point, @dpm.gauge_length, plus, @dpm.youngs_modulus) %>
+<% minusfit = getSystemVars(trial, pstrain, tstrain, hardstress, @dpm.necking_point, @dpm.gauge_length, minus, @dpm.youngs_modulus) %>
+
+<% swiftscos = [] %>
+<% swiftscos << getSwifts(normal[0], normal[1], normal[2], normal[3]) %>
+<% swiftscos << getSwifts(plusfit[0], plusfit[1], plusfit[2], plusfit[3]) %>
+<% swiftscos << getSwifts(minusfit[0], minusfit[1], minusfit[2], minusfit[3]) %>
+
+<% swiftgraphs = [] %>
+
+<% swiftgraphs << createSwiftPoints(@dpm.necking_point, 500, hardstress.length, swiftscos[0]) %>
+<% swiftgraphs << createSwiftPoints(@dpm.necking_point, 500, hardstress.length, swiftscos[1]) %>
+<% swiftgraphs << createSwiftPoints(@dpm.necking_point, 500, hardstress.length, swiftscos[2]) %>
+<% hardstress.delete(@dpm.necking_point)%>
+<%  finalgraphs = []%>
+<%  finalgraphs << rounder(hardstress.merge(swiftgraphs[0]), 4)%>
+<%  finalgraphs << rounder(hardstress.merge(swiftgraphs[1]), 4)%>
+<%  finalgraphs << rounder(hardstress.merge(swiftgraphs[2]), 4)%>
 <p>
-<%= line_chart graph.map.with_index {|ea, i| {:name => i+1, :data => ea}}, {discrete: true, library: {pointSize: 0, title: "Hardening Curve"}} %>
+<%= line_chart finalgraphs.map.with_index {|ea, i| {:name => i+1, :data => ea}}, {discrete: true, library: {pointSize: 0, title: "Final Material Hardening Curves", vAxis:{title: "True Stress (MPa)"}, hAxis:{title: "True Plastic Strain"}}} %>
 </p>
 
-<%= form_for(@dpm, :url => step3_path(:id => @dpm.id), :method => 'put') do |f| %>
+
+<%= form_for(@dpm, :url => step5_path(:id => @dpm.id), :method => 'put') do |f| %>
   <% if @dpm.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@dpm.errors.count, "error") %> prohibited this dpm from being saved:</h2>
@@ -29,19 +55,12 @@
     </div>
   <% end %>
 
-
+  <p>TODO: Add attributes for the final output variable values, We can store them and produce the right output for LS Dyna</p>
   <div class="field">
-  	<%= f.label :fitting_param %><br>
-    <%= f.number_field :fitting_param %>
+    <%= f.label :necking_point %><br>
+    <%= f.number_field :necking_point, :step => 'any' %>
   </div>
-  <div class="field">
-    <%= f.label :threshold %><br>
-    <%= f.number_field :threshold %>
-  </div>
-   <div class="actions">
+  <div class="actions">
     <%= f.submit %>
   </div>
 <% end %>
-
-<%= link_to 'Edit', edit_dpm_path(@dpm) %> |
-<%= link_to 'Back', dpms_path %>

@@ -14,7 +14,7 @@
 
 <strong>STEP 3: Enter Fitting Parameter and Accuracy Threshold</strong>
 <p>
-<%= line_chart hardstress, {discrete: true, library: {pointSize: 0, title: "Hardening Curve Pre-Necking", hAxis: {title: "True Plastic Strain"}, vAxis: {title: "True Stress (MPa)"}}} %>
+<%= line_chart hardstress, {discrete: true, library: {pointSize: 0, title: "Hardening Curve Pre-Necking", hAxis: {title: "True Plastic Strain"}, vAxis: {title: "True Stress (MPa)", viewWindow:{ max:maxMin[0]*1.1, min:maxMin[1]}}}} %>
 </p>
 
 <%= form_for(@dpm, :url => step3_path(:id => @dpm.id), :method => 'put') do |f| %>

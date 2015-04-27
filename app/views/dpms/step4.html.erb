@@ -6,7 +6,7 @@
 -solve for the 3 sets of systems 
 -plot these 3 final graphs once they are calculated
 -->
-<strong>STEP 5: Finalize Output </strong>
+<strong> STEP 4: Finalize Output </strong>
 <% graph = create_hash(Rails.root.to_s.concat("/public").concat(@dpm.filename.url)) %>
 <% trial = graph[@dpm.graph_number - 1] %>
 <% pstrain = tp_strain(trial, @dpm.youngs_modulus) %>
@@ -26,24 +26,42 @@
 <% swiftscos << getSwifts(normal[0], normal[1], normal[2], normal[3]) %>
 <% swiftscos << getSwifts(plusfit[0], plusfit[1], plusfit[2], plusfit[3]) %>
 <% swiftscos << getSwifts(minusfit[0], minusfit[1], minusfit[2], minusfit[3]) %>
-
+<% if swiftscos[0] == nil %>
+<H1>ERROR: COULD NOT SOLVE FOR SWIFT COEFFICIENTS</H1>
+<strong>PLEASE GO BACK TO STEP 2 AND CHOOSE NEW NECKING POINT</strong>
+<% else %>
 <% swiftgraphs = [] %>
 
 <% swiftgraphs << createSwiftPoints(@dpm.necking_point, 500, hardstress.length, swiftscos[0]) %>
 <% swiftgraphs << createSwiftPoints(@dpm.necking_point, 500, hardstress.length, swiftscos[1]) %>
 <% swiftgraphs << createSwiftPoints(@dpm.necking_point, 500, hardstress.length, swiftscos[2]) %>
-<% hardstress.delete(@dpm.necking_point)%>
-<%	finalgraphs = []%>
-<%	finalgraphs << hardstress.merge(swiftgraphs[0])%>
-<%	finalgraphs << hardstress.merge(swiftgraphs[1])%>
-<%	finalgraphs << hardstress.merge(swiftgraphs[2])%>
+<% output = []%>
+<% output[0] = rounder(swiftgraphs[0], 4) %>
+<% output[1] = rounder(swiftgraphs[1], 4) %>
+<% output[2] = rounder(swiftgraphs[2], 4) %>
+<% maxMin = getMaxMin(output[0]) %>
 <p>
-<%= line_chart finalgraphs.map.with_index {|ea, i| {:name => i+1, :data => ea}}, {discrete: true, library: {pointSize: 0, title: "Hardening Curve"}} %>
+<%= line_chart output.map.with_index {|ea, i| {:name => i+1, :data => ea}}, {discrete: true, library: {pointSize: 0, title: "Swift Hardening Law Fit", vAxis: {title: "True Stress (MPa)", viewWindow:{ max:maxMin[0]*1.1, min:maxMin[1]*0.9}}, hAxis: {title: "True Strain (mm/mm)"}}} %>
 </p>
+<%= form_for(@dpm, :url => step4_path(:id => @dpm.id), :method => 'put') do |f| %>
+  <% if @dpm.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@dpm.errors.count, "error") %> prohibited this dpm from being saved:</h2>
 
+      <ul>
+      <% @dpm.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <p>Please enter output file name</p>
+  <div class="field">
+    <%= f.label :output_file %><br>
+    <%= f.text_field :output_file%>
+  </div>
 
-<strong>STEP 4:Filename:</strong>
-
-
-<%= link_to 'Edit', edit_dpm_path(@dpm) %> |
-<%= link_to 'Back', dpms_path %>
+    <%= f.submit "Final Graph"%>
+  </div>
+<% end %>
+<% end %>
