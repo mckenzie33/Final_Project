@@ -12,9 +12,9 @@
 <% hardstress = removePastX(pstrain, @dpm.necking_point)%>
 
 
-<strong>STEP 3: Hard Stress/Strain</strong>
+<strong>STEP 3: Enter Fitting Parameter and Accuracy Threshold</strong>
 <p>
-<%= line_chart hardstress, {discrete: true, library: {pointSize: 0, title: "Hardening Curve"}} %>
+<%= line_chart hardstress, {discrete: true, library: {pointSize: 0, title: "Hardening Curve Pre-Necking", hAxis: {title: "True Plastic Strain"}, vAxis: {title: "True Stress (MPa)"}}} %>
 </p>
 
 <%= form_for(@dpm, :url => step3_path(:id => @dpm.id), :method => 'put') do |f| %>

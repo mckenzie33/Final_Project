@@ -1,6 +1,8 @@
+<strong>STEP 1: Choose a Trial, Gaugelength, Young's Modulus</strong>
+
 <p>
 <% graph = create_hash(Rails.root.to_s.concat("/public").concat(@dpm.filename.url)) %>
-<%= line_chart graph.map.with_index {|ea, i| {:name => i+1, :data => ea}}, {discrete: true, library: {pointSize: 0, title: "Plotted Graphs"}} %>
+<%= line_chart graph.map.with_index {|ea, i| {:name => i+1, :data => ea}}, {discrete: true, library: {pointSize: 0, title: "Engineering Stress vs. Strain", hAxis: {title: "Strain"}, vAxis: {title: "Stress (MPa)"}}} %>
 </p>
 
 
@@ -23,10 +25,12 @@
     <%= f.number_field :graph_number %>
   </div>
   <div class="field">
+    <p> Please enter Young's Modulus in GPa</p>
     <%= f.label :youngs_modulus %><br>
     <%= f.number_field :youngs_modulus %>
   </div>
   <div class="field">
+    <p> Please enter gaugelength in mm </p>
     <%= f.label :gauge_length %><br>
     <%= f.number_field :gauge_length %>
   </div>

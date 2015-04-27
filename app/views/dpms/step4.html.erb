@@ -6,6 +6,7 @@
 -solve for the 3 sets of systems 
 -plot these 3 final graphs once they are calculated
 -->
+<strong>STEP 5: Finalize Output </strong>
 <% graph = create_hash(Rails.root.to_s.concat("/public").concat(@dpm.filename.url)) %>
 <% trial = graph[@dpm.graph_number - 1] %>
 <% pstrain = tp_strain(trial, @dpm.youngs_modulus) %>
