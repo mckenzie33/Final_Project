@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150427154057) do
+ActiveRecord::Schema.define(version: 20150427202117) do
 
   create_table "dpms", force: true do |t|
     t.datetime "created_at"
@@ -25,6 +25,44 @@ ActiveRecord::Schema.define(version: 20150427154057) do
     t.float    "fitting_param"
     t.integer  "threshold"
     t.string   "output_file"
+    t.float    "mid",            default: 0.0
+    t.float    "ro",             default: 0.0
+    t.float    "eee",            default: 0.0
+    t.float    "pr",             default: 0.0
+    t.float    "sigy",           default: 0.0
+    t.float    "etan",           default: 0.0
+    t.float    "fail",           default: 1.0e+21
+    t.float    "tdel",           default: 0.0
+    t.float    "c",              default: 0.0
+    t.float    "p",              default: 0.0
+    t.float    "lcss",           default: 0.0
+    t.float    "lcsr",           default: 0.0
+    t.float    "vp",             default: 0.0
+    t.float    "lcf",            default: 0.0
+    t.float    "eps1",           default: 0.0
+    t.float    "eps2",           default: 0.0
+    t.float    "eps3",           default: 0.0
+    t.float    "eps4",           default: 0.0
+    t.float    "eps5",           default: 0.0
+    t.float    "eps6",           default: 0.0
+    t.float    "eps7",           default: 0.0
+    t.float    "eps8",           default: 0.0
+    t.float    "es1",            default: 0.0
+    t.float    "es2",            default: 0.0
+    t.float    "es3",            default: 0.0
+    t.float    "es4",            default: 0.0
+    t.float    "es5",            default: 0.0
+    t.float    "es6",            default: 0.0
+    t.float    "es7",            default: 0.0
+    t.float    "es8",            default: 0.0
+    t.float    "lcid",           default: 0.0
+    t.float    "sidr",           default: 0.0
+    t.float    "sfa",            default: 0.0
+    t.float    "sfo",            default: 0.0
+    t.float    "offa",           default: 0.0
+    t.float    "offo",           default: 0.0
+    t.float    "dattyp",         default: 0.0
+    t.string   "person"
   end
 
   create_table "materials", force: true do |t|

@@ -35,14 +35,14 @@
   	<%= f.label :fitting_param %><br>
     <%= f.number_field :fitting_param , :step => 'any'%>
   </div>
+  <p>Please enter an accuracy threshold (Percentage as 1-100)</p>
   <div class="field">
     <%= f.label :threshold %><br>
     <%= f.number_field :threshold, :step => 'any' %>
   </div>
    <div class="actions">
-    <%= f.submit %>
+    <%= f.submit "Next Step" %>
   </div>
 <% end %>
 
-<%= link_to 'Edit', edit_dpm_path(@dpm) %> |
-<%= link_to 'Back', dpms_path %>
+<%= link_to 'Change Input File', edit_dpm_path(@dpm) %>

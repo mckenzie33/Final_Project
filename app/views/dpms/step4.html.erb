@@ -41,7 +41,7 @@
 <% output[2] = rounder(swiftgraphs[2], 4) %>
 <% maxMin = getMaxMin(output[0]) %>
 <p>
-<%= line_chart output.map.with_index {|ea, i| {:name => i+1, :data => ea}}, {discrete: true, library: {pointSize: 0, title: "Swift Hardening Law Fit", vAxis: {title: "True Stress (MPa)", viewWindow:{ max:maxMin[0]*1.1, min:maxMin[1]*0.9}}, hAxis: {title: "True Strain (mm/mm)"}}} %>
+<%= line_chart output.map.with_index {|ea, i| {:name => i+1, :data => ea}}, {discrete: true, library: {pointSize: 0, title: "Swift Hardening Law Fit", vAxis: {title: "True Stress (MPa)", viewWindow:{ max:maxMin[0]*1.1, min:maxMin[1]}}, hAxis: {title: "True Strain (mm/mm)"}}} %>
 </p>
 <%= form_for(@dpm, :url => step4_path(:id => @dpm.id), :method => 'put') do |f| %>
   <% if @dpm.errors.any? %>
@@ -61,7 +61,7 @@
     <%= f.text_field :output_file%>
   </div>
 
-    <%= f.submit "Final Graph"%>
+    <%= f.submit "Next Step" %>
   </div>
 <% end %>
 <% end %>
