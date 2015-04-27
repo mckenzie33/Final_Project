@@ -1,7 +1,14 @@
+#The following functions are used to facilitate the data processing
+#module implemented in Matlab by the MSE team.  These functions will 
+#be mostly called by the views for graphing purposes (currently using
+#Chartick gem for graphing, which takes sets of hashes as input for 
+#graphs). 
+
 module DpmsHelper
 	include Math
-	#used to create a set of graphs for the dpm to show
-	#the user picks one graph for the dpm process
+	#param filename is a string representing the file path.
+	#The output is an array of hashes (x=>y values)
+	#The user picks one graph for the dpm process.
 	def create_hash(filename)
 		graphs = [] #array of all graphs
 		graph = [] #array of points
@@ -34,6 +41,7 @@ module DpmsHelper
 
 	#returns the last point in the hash
 	#takes a hash as input 
+	#output is array with x as 0 index and y as index 1
 	def getLastPoint myhash
 			#sort the hash and get the x values
 			dummy = myhash.keys.sort
@@ -43,7 +51,10 @@ module DpmsHelper
 			yval = myhash[xval]
 			return [xval, yval]
 	end
-
+	#simple function that takes a hash as input.
+	#Returns an array with the min and max values
+	#in the hash.  This function is mostly used to 
+	#adjust the graph axes.
 	def getMaxMin(graph)
 		dummy=[]
 		dummy[0]=graph.values.max
@@ -52,15 +63,15 @@ module DpmsHelper
 	end
 
 
-# 	tstrain=log(1+strain); tstress=stress.*(1+strain);
-# %Subtract out elastic region of curve
-# pstrain=tstrain-(tstress./E);
-
+	# tstrain=log(1+strain);
+	# tstress=stress * (1+strain);
+	# pstrain=tstrain-(tstress./youngsmodulus);
+	# youngs_modulus needs to always be multiplied by 1000
 	#this functions returns the tstrain (array) 
 	#and pstrain vs tstress (hash) values
 	#trial is a hash 
 	#youngs is youngs modulus to calculate tstress
-	#the return value is a hash [tstrain pstrainvststress]
+	#the return value is a hash {tstrain => pstrainvststress}
 	def tp_strain trial, youngs
 		pstrain = Hash.new
 		trial.each do |key, value| 
@@ -75,7 +86,9 @@ module DpmsHelper
 		return pstrain
 	end	
 
-	def getTstrain trial, youngs
+	#this function takes a hash of points as input
+	#and returns an array of tstrain values
+	def getTstrain trial
 		tstrain = Array.new
 		trial.each do |key, value|
 			#change the key to the tstrain
@@ -84,22 +97,26 @@ module DpmsHelper
 		end
 		return tstrain
 	end
-
+	#takes a hash of points and number of desired
+	#decimal places.  
+	#output is the input hash with rounded keys
+	#used to trim X axis labels
 	def rounder graph, precision
-		adam = Hash.new
+		rtn = Hash.new
 		graph.each do | key, value |
 			new_key = key.round(precision)
-			adam.store(new_key, value)
+			rtn.store(new_key, value)
 		end
-		adam
+		rtn
 	end
 
+	#Input is a hash of points representing a graph
+	#Outputs a new hash representing the derivative
+	#of the input graph.
 	def deriv trial
 		dummy = Hash.new
 		trial.sort
-		puts "trial key: ", trial.keys
 		keys = trial.keys
-		puts "keys: ", keys
 		values = trial.values
 		#getting derivative minus first and last points
 		for i in 1...keys.length - 2
@@ -109,6 +126,12 @@ module DpmsHelper
 		dummy
 	end
 
+	#Input is two hashes and a threshold value
+	#Trial is a hash representing a curve on a graph
+	#Derivative is a hash representing the derivative of trial
+	#thresh is the acceptable percent difference between 
+	#two points with the same x values on these graphs.  This
+	#method is used to recommend a necking point 
 	def intersection trial, derivative, thresh
 		dummy = Hash.new
 		trial.each do |key, value|
@@ -123,9 +146,11 @@ module DpmsHelper
 		end
 		dummy
 	end
-	#end
 	# Returns the value of f(x)
 	# f(x) = (a+x)/(b+x))^(b+x) - c/d
+	# f(x) is the function used to find swift
+	# coefficients. This particular equation is 
+	# associated with finding swift coefficients
 	def equationValue(a, b, c, d, x)
 		f = ((a+x)/(b+x))**(b + x)
 		f = f - (c/d)
@@ -143,14 +168,14 @@ module DpmsHelper
 		if (f1 < f2)
 			hasError = true
 	    end
-
-	    #puts "f1 = " + f1.to_s
-	    #puts "c/d = " + f2.to_s
-	    #puts "hasError = " + hasError.to_s
-
 		return hasError
 	end
-
+	#This function uses a bisection method to approximate 
+	# a solution for finding swift coefficients. There are other
+	# methods of approximation that may work better with the
+	# functionality of this DPM, so these should be looked into.
+	#Input is four variables representing eps_pf, eps_pn, sigma_f, sigma_n
+	#Output is the value of eps_o.  n and k are found afterward using sub
 	def solve(a, b, c, d)
 		p=0.0
 		q=200.0
@@ -197,6 +222,8 @@ module DpmsHelper
 	end
 
 	#this function will return the swift coefficients
+	#the input of this function is the four variables needed
+	# to solve the system of equations
 	#these are needed to create the final output
 	#the output of this function is [eps_o, n, k]
 	def getSwifts epsPF, epsPN, sigF, sigN
@@ -217,6 +244,7 @@ module DpmsHelper
 	#the hash where the key is greater than xval
 	#the return is a hash of only key/value pairs 
 	#that satisfy this condition
+	#This is used to cutoff points after necking point
 	def removePastX myhash, xval
 		rtn = Hash.new
 		myhash.each do |key, value|
@@ -227,44 +255,38 @@ module DpmsHelper
 		rtn
 	end
 
-	#make sure that all of these values make sense
-	#TODO: test the output
+	#Input is loaded, and this function does a lot at once
+	# stress => hash created from input file of dpm => stress vs strain
+	# pstrain => hash representing tstress vs pstrain
+	# tstrain => array of x values representing tstrain
+	# hardstress => hash representing hardstress vs hardstrain
+	# neckingpoint => this is the saved necking point of the dpm 
+	# gauge => gaugelength in mm => saved in dpm 
+	# fitparam => this is the fitting_parameter of the dpm as a float
+	# youngs => this youngs modulus saved in dpm (in GPa, remember to convert to MPa when using)
 	def getSystemVars stress, pstrain, tstrain, hardstress, neckingpoint, gauge, fitparam, youngs
-		#get the index of the last point 
-		neckindex = hardstress.length - 1
-		df = getLastPoint(pstrain)[0]
-		dn = tstrain.sort[neckindex]
-		sigma_n = pstrain[pstrain.keys.sort[neckindex]]
-		laststresspoint = getLastPoint(stress)
-		sigma_ef = laststresspoint[1]
+		
+		neckindex = hardstress.length - 1 		#get the index of the last point in hardstress
+		df = getLastPoint(pstrain)[0]   		#last x value pstrain curve
+		dn = tstrain.sort[neckindex]			#tstrain value at necking point
+		eps_pn = getLastPoint(hardstress)[0]	#x value at last point of hardstress
+		sigma_n = pstrain[pstrain.keys.sort[neckindex]]	#tstress value at necking point
+		laststresspoint = getLastPoint(stress)	#last point on the stress-strain graph
+		sigma_ef = laststresspoint[1]			
 		eps_en = laststresspoint[0]
-		df_dn = ((E**df) * gauge) - ((E**dn) *gauge)
+		df_dn = ((E**df) * gauge) - ((E**dn) *gauge)	
 		eps_f = Math.log(eps_en + 1 + (df_dn/fitparam))
 		sigma_f = sigma_ef * (eps_en + 1 + (df_dn/fitparam))
 		eps_pf = eps_f - (sigma_f/(youngs*1000))
-		return [eps_pf, neckingpoint, sigma_f, sigma_n]
+		return [eps_pf, eps_pn, sigma_f, sigma_n]
 	end
-	#remove all points after the necking point
-	#eps_pn = x value pstrain at necking point (this is our necking point attr)
-	#df = last pstrain value (x)
-	#dn = tstrain necking point (x)
-	#sigma_n is tstress at necking point (y)
-	#TODO separate TSTRESS and PSTRESS functions
-	#sigma_ef = stress (y) at last point (normal graph)
-	#eps_en = strain (x) at last point (normal graph)
 
-	#hardstress/strain is graph after removing past necking point
-	#df_dn = ((E**df) * gaugelength) - ((E**dn) *gaugelength)
-	
-	#eps_f = Math.log(eps_en + 1 + (df_dn)/fittingparam
-	#sigma_f = sigma_ef * (eps_en + 1 + (df_dn)/fittingparam)
-	#eps_pf = eps_f - (sigma_f/youngsmod)
-
-	#plus = fittingparam*(1+(accuracy/100))
-	#minus = fittingparam*(1-(accuracy/100))
-
-	#get two sets of new values for eps_f, sigma_f, eps_pf (plus/minus)
-	#solve the system of equations 3 times
+	#Input
+	# firstX => this is the first value on the graph that we want to start at
+	# totalpoints => number of points we want our graph to use total
+	# currentsize => this is the total number of points already in our graph
+	# swiftsco => array of swift coefficients to generate y values [eps_o n k]
+	#Output is a hash of points for the swift portion of the final graph
 	def createSwiftPoints firstX, totalpoints, currentsize, swiftsco
 		#we want evenly spaced points and their corresponding swift values
 		rtn = Hash.new
@@ -279,15 +301,4 @@ module DpmsHelper
 		end
 		rtn
 	end
-
-
-	#this function returns the necking index
-
 end
-	#create (500 - size) more points, equally spaced x's
-	    #starting at the end of hardstress graph
-	#use the k's, n's, eps_o's from above to get three graphs
-	#use the x points generated creating the line values
-	#and swifts equation for all three graphs where:
-	#y = k * (eps_o + x)**n
-	#join hardstress with the swift values for the final output values

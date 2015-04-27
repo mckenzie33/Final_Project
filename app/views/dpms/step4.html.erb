@@ -10,7 +10,7 @@
 <% trial = graph[@dpm.graph_number - 1] %>
 <% pstrain = tp_strain(trial, @dpm.youngs_modulus) %>
 
-<% tstrain = getTstrain(trial, @dpm.youngs_modulus) %>
+<% tstrain = getTstrain(trial) %>
 
 <% hardstress = removePastX(pstrain, @dpm.necking_point) %>
 
