@@ -312,8 +312,14 @@ module DpmsHelper
 	#                eps1, eps2, eps3, eps4, eps5, eps6, eps7, eps8,
 	#                es1, es2, es3, es4, es5, es6, es7, es8,
 	#                lcid, sidr, sfa, sfo, offa, offo, dattyp }
-	def outputFile(myhash)
-		File.open(myhash["filename"]+".k", "w") do |f|
+	def outputFile(myhash, filepath, filename)
+
+		dirname = File.dirname(filepath)
+		unless File.directory?(dirname)
+  		FileUtils.mkdir_p(dirname)
+		end
+		filename = filepath + filename
+		File.open(filename + ".k", "w") do |f|
 	    	f.puts("\$\# LS-DYNA Keyword File created by" + myhash["person"].to_s + " at "+ Time.now.asctime) #List time
 	    	f.puts("\*KEYWORD")
 	    	f.puts("\*MAT_PIECEWISE_LINEAR_PLASTICITY_TITLE")
@@ -329,15 +335,57 @@ module DpmsHelper
 	        f.puts("\$\#\tes1\tes2\teps3\tes4\tes5\tes6\tes7\tes8")
 	        f.puts("\t" + myhash["es1"].to_s + "\t" + myhash["es2"].to_s + "\t" + myhash["es3"].to_s + "\t" + myhash["es4"].to_s + "\t" +
 	            	 myhash["es5"].to_s + "\t" + myhash["es6"].to_s + "\t" + myhash["es7"].to_s + "\t" + myhash["es8"].to_s)
-	        f.put("\*DEFINE_CURVE")
+	        f.puts("\*DEFINE_CURVE")
 	        f.puts("\$\#\tlcid\tsidr\tsfa\tsfo\toffa\toffo\tdattyp")
 	        f.puts("\t" + myhash["lcid"].to_s + "\t" + myhash["sidr"].to_s + "\t" + myhash["sfa"].to_s + "\t" + myhash["sfo"].to_s + "\t" +
 	            	 myhash["offa"].to_s + "\t" + myhash["offo"].to_s + "\t" + myhash["dattyp"].to_s)
-	        f.put("\$\#\t\ta1\t\to1")
+	        f.puts("\$\#\t\ta1\t\to1")
 	    	myhash["outputhash"].each do |key, value| 
 	        	f.puts("\t#{key}\t#{value}")
 	    	end
 	        f.puts("\*END")
 		end
+	end
+
+	def getFinals(person, outputhash, attrHash, mid, ro, eee, pr, sigy, etan, fail, tdel, c, p, lcss, lcsr, vp, lcf, eps1, eps2, eps3, eps4, eps5, eps6, eps7, eps8, es1, es2, es3, es4, es5, es6, es7, es8, lcid, sidr, sfa, sfo, offa, offo, dattyp)
+		attrHash["person"] = person
+		attrHash["outputhash"] = Marshal.load(Marshal.dump(outputhash))
+		attrHash["mid"] = mid
+		attrHash["ro"] = ro
+		attrHash["eee"] = eee
+		attrHash["pr"] = pr
+		attrHash["sigy"] = sigy
+		attrHash["etan"] = etan
+		attrHash["fail"] = fail
+		attrHash["tdel"] = tdel
+		attrHash["c"] = c
+		attrHash["p"] = p
+		attrHash["lcss"] = lcss
+		attrHash["lcsr"] = lcsr
+		attrHash["vp"] = vp
+		attrHash["lcf"] = lcf
+		attrHash["eps1"] = eps1
+		attrHash["eps2"] = eps2
+		attrHash["eps3"] = eps3
+		attrHash["eps4"] = eps4
+		attrHash["eps5"] = eps5
+		attrHash["eps6"] = eps6
+		attrHash["eps7"] = eps7
+		attrHash["eps8"] = eps8
+		attrHash["es1"] = es1
+		attrHash["es2"] = es2
+		attrHash["es3"] = es3
+		attrHash["es4"] = es4
+		attrHash["es5"] = es5
+		attrHash["es6"] = es6
+		attrHash["es7"] = es7
+		attrHash["es8"] = es8
+		attrHash["lcid"] = lcid
+		attrHash["sidr"] = sidr
+		attrHash["sfa"] = sfa
+		attrHash["sfo"] = sfo
+		attrHash["offa"] = offa
+		attrHash["offo"] = offo
+		attrHash["dattyp"] = dattyp
 	end
 end

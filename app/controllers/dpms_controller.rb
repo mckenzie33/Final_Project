@@ -1,5 +1,5 @@
 class DpmsController < ApplicationController
-  before_action :set_dpm, only: [:show, :edit, :update, :destroy, :step1, :step2, :step3, :step4, :step5]
+  before_action :set_dpm, only: [:show, :edit, :update, :destroy, :step1, :step2, :step3, :step4, :step5, :step6]
   helper DpmsHelper
 
   # GET /dpms
@@ -105,10 +105,22 @@ class DpmsController < ApplicationController
   def step5
     respond_to do |format|
       if @dpm.update(dpm_params)
-        format.html { render '/dpms/step5', notice: 'DPM Output Updated'}
+        format.html { render '/dpms/step6'}
         format.json { head :no_content }
       else
         format.html { render '/dpms/step5', notice: 'File Output Error, please retry'}
+        format.html { render json: @dpm.errors, status: :unprocessable_entity}
+      end
+    end
+  end
+
+  def step6
+    respond_to do |format|
+      if @dpm.update(dpm_params)
+        format.html { render '/dpms/step6'}
+        format.json { head :no_content }
+      else
+        format.html { render '/dpms/step6', notice: 'File Output Error, please retry'}
         format.html { render json: @dpm.errors, status: :unprocessable_entity}
       end
     end
@@ -131,5 +143,8 @@ class DpmsController < ApplicationController
     end
     # Never trust parameters from the scary internet, only allow the white list through.
     def dpm_params
-      params.require(:dpm).permit(:filename, :graph_number, :youngs_modulus, :gauge_length, :necking_point, :fitting_param, :threshold)     end
+      params.require(:dpm).permit(:filename, :person, :output_file, :graph_number, :youngs_modulus, :gauge_length, :necking_point, :fitting_param, :threshold,
+        :mid, :ro, :eee, :pr, :sigy, :etan, :fail, :tde, :c, :p, :lcss, :lcsr, :vp, :lcf, :eps1, :eps2, :eps3, :eps4, :eps5, :eps6, :eps7, 
+        :eps8, :es1, :es2, :es3, :es4, :es5, :es6, :es7, :es8, :lcid, :sidr, :sfa, :sfo, :offa, :offo, :dattyp)     
+    end
   end
