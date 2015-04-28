@@ -30,16 +30,20 @@
     </div>
   <% end %>
 
-
+<div class="col-lg-3">
   <div class="field">
+  <p>Please enter an estimation for fitting parameter</p>
   	<%= f.label :fitting_param %><br>
     <%= f.number_field :fitting_param , :step => 'any'%>
   </div>
-  <p>Please enter an accuracy threshold (Percentage as 1-100)</p>
+</div>
+<div class="col-lg-3">
   <div class="field">
+    <p>Please enter an accuracy threshold (Percentage as 1-100)</p>
     <%= f.label :threshold %><br>
     <%= f.number_field :threshold, :step => 'any' %>
   </div>
+</div>
    <div class="actions">
     <%= f.submit "Next Step" %>
   </div>

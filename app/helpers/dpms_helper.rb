@@ -105,7 +105,8 @@ module DpmsHelper
 		rtn = Hash.new
 		graph.each do | key, value |
 			new_key = key.round(precision)
-			rtn.store(new_key, value)
+			new_value = value.round(precision)
+			rtn.store(new_key, new_value)
 		end
 		rtn
 	end
@@ -312,6 +313,7 @@ module DpmsHelper
 	#                eps1, eps2, eps3, eps4, eps5, eps6, eps7, eps8,
 	#                es1, es2, es3, es4, es5, es6, es7, es8,
 	#                lcid, sidr, sfa, sfo, offa, offo, dattyp }
+	#this function is called to create the output file
 	def outputFile(myhash, filepath, filename)
 
 		dirname = File.dirname(filepath)
@@ -320,10 +322,10 @@ module DpmsHelper
 		end
 		filename = filepath + filename
 		File.open(filename + ".k", "w") do |f|
-	    	f.puts("\$\# LS-DYNA Keyword File created by" + myhash["person"].to_s + " at "+ Time.now.asctime) #List time
+	    	f.puts("\$\# LS-DYNA Keyword File created by " + myhash["person"].to_s + " at "+ Time.now.asctime) #List time
 	    	f.puts("\*KEYWORD")
 	    	f.puts("\*MAT_PIECEWISE_LINEAR_PLASTICITY_TITLE")
-	    	f.puts("\$\#\tmid\tro\teee\tpr\tsigy\tetan\tfail\ttdel")
+	    	f.puts("\$\#\tmid\tro\te\tpr\tsigy\tetan\tfail\ttdel")
 	    	f.puts("\t" + myhash["mid"].to_s + "\t" + myhash["ro"].to_s + "\t" + myhash["eee"].to_s + "\t" + myhash["pr"].to_s + "\t" +
 	             myhash["sigy"].to_s + "\t" + myhash["etan"].to_s + "\t" + myhash["fail"].to_s + "\t" + myhash["tdel"].to_s)
 	    	f.puts("\$\#\tc\tp\tlcss\tlcsr\tvp\tlcf")
@@ -339,14 +341,16 @@ module DpmsHelper
 	        f.puts("\$\#\tlcid\tsidr\tsfa\tsfo\toffa\toffo\tdattyp")
 	        f.puts("\t" + myhash["lcid"].to_s + "\t" + myhash["sidr"].to_s + "\t" + myhash["sfa"].to_s + "\t" + myhash["sfo"].to_s + "\t" +
 	            	 myhash["offa"].to_s + "\t" + myhash["offo"].to_s + "\t" + myhash["dattyp"].to_s)
-	        f.puts("\$\#\t\ta1\t\to1")
+	        f.puts("\$\#\ta1\to1")
 	    	myhash["outputhash"].each do |key, value| 
 	        	f.puts("\t#{key}\t#{value}")
 	    	end
 	        f.puts("\*END")
 		end
 	end
-
+	#this long function is used to setup the attrHash
+	#Refer to Mat24 LSDyna information for the arguments mid, ro ...+
+	#the attrHash is later passed as argument to output the final file
 	def getFinals(person, outputhash, attrHash, mid, ro, eee, pr, sigy, etan, fail, tdel, c, p, lcss, lcsr, vp, lcf, eps1, eps2, eps3, eps4, eps5, eps6, eps7, eps8, es1, es2, es3, es4, es5, es6, es7, es8, lcid, sidr, sfa, sfo, offa, offo, dattyp)
 		attrHash["person"] = person
 		attrHash["outputhash"] = Marshal.load(Marshal.dump(outputhash))

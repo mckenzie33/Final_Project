@@ -1,8 +1,5 @@
-<!-- create hashes
-	-create a file using output_file path
-	-call output function using this path
-	-
-	-->
+
+
 
 <% graph = create_hash(Rails.root.to_s.concat("/public").concat(@dpm.filename.url)) %>
 <% trial = graph[@dpm.graph_number - 1] %>
@@ -26,16 +23,16 @@
 <% hardstress.delete(@dpm.necking_point)%>
 <%  finalgraphs = []%>
 <%  finalgraphs << rounder(hardstress.merge(swiftgraphs[0]), 4)%>
-<% outputHash = finalgraphs[0] %>
+<% outputHash = rounder(finalgraphs[0], 4) %>
 <% attrHash = {} %>
-<% getFinals(@dpm.person,outputHash,attrHash, @dpm.mid, @dpm.ro, @dpm.eee, @dpm.pr, @dpm.sigy, @dpm.etan, @dpm.fail, @dpm.tdel, @dpm.c,
-			@dpm.p,@dpm.lcss,@dpm.lcsr, @dpm.vp, @dpm.lcf,@dpm.eps1, @dpm.eps2, @dpm.eps3, @dpm.eps4, @dpm.eps5, @dpm.eps6,
-			@dpm.eps7, @dpm.eps8, @dpm.es1, @dpm.es2, @dpm.es3, @dpm.es4, @dpm.es5, @dpm.es6, @dpm.es7, @dpm.es8, @dpm.lcid,
-			@dpm.sidr, @dpm.sfa, @dpm.sfo, @dpm.offa, @dpm.offo, @dpm.dattyp)%>
-<%= @dpm.output_file%>
-<% filepath = Rails.root.to_s.concat("/public/dpm/") + @dpm.id.to_s %>
+<% getFinals(@dpm.person,outputHash,attrHash, @dpm.mid, @dpm.ro, @dpm.eee, @dpm.pr, @dpm.sigy, @dpm.etan, @dpm.fail, @dpm.tdel, @dpm.c,@dpm.p,@dpm.lcss,@dpm.lcsr, @dpm.vp, @dpm.lcf,@dpm.eps1, @dpm.eps2, @dpm.eps3, @dpm.eps4, @dpm.eps5, @dpm.eps6,
+	@dpm.eps7, @dpm.eps8, @dpm.es1, @dpm.es2, @dpm.es3, @dpm.es4, @dpm.es5, @dpm.es6, @dpm.es7, @dpm.es8, @dpm.lcid,
+	@dpm.sidr, @dpm.sfa, @dpm.sfo, @dpm.offa, @dpm.offo, @dpm.dattyp)%>
+<% filepath = Rails.root.to_s.concat("/public/dpm/") + @dpm.id.to_s  %>
 <% outputFile(attrHash, filepath, @dpm.output_file)%>
 
-
+<h3>FILE SUCCESSFULLY CREATED</h3>
+<h2>Filepath:</h2>
+<%= filepath %>
 
 

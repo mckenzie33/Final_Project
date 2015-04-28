@@ -41,7 +41,7 @@
 <%= line_chart finalgraphs.map.with_index {|ea, i| {:name => i+1, :data => ea}}, {discrete: true, library: {pointSize: 0, title: "Final Material Hardening Curves", vAxis:{title: "True Stress (MPa)"}, hAxis:{title: "True Plastic Strain"}}} %>
 </p>
 
-
+<strong>Please fill in data for output file</strong>
 <%= form_for(@dpm, :url => step5_path(:id => @dpm.id), :method => 'put') do |f| %>
   <% if @dpm.errors.any? %>
     <div id="error_explanation">

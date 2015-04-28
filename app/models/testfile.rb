@@ -4,5 +4,7 @@ class Testfile < ActiveRecord::Base
 	#validates :material, presence: true
 	#validates :material, :presence => true
 	mount_uploader :filename, TestFileUploader
+	validates_presence_of :filename
+	validates_presence_of :mat_name
 	attr_accessible  :filename, :file_type, :file_contents, :confidence_rank, :material_id, :mat_name, :comments, :user_id
 end

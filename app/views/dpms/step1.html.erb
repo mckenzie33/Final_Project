@@ -20,19 +20,26 @@
   <% end %>
 
 
-  <div class="field">
-  	<%= f.label :graph_number %><br>
-    <%= f.number_field :graph_number %>
+  <div class="col-lg-3">
+    <div class="field">
+      <p>Please Choose a graph</p>
+    	<%= f.label :graph_number %><br>
+      <%= f.number_field :graph_number %>
+    </div>
   </div>
-  <div class="field">
-    <p> Please enter Young's Modulus in GPa</p>
-    <%= f.label :youngs_modulus %><br>
-    <%= f.number_field :youngs_modulus %>
+  <div class="col-lg-3">
+    <div class="field">
+      <p> Please enter Young's Modulus in GPa</p>
+      <%= f.label :youngs_modulus %><br>
+      <%= f.number_field :youngs_modulus %>
+    </div>
   </div>
-  <div class="field">
-    <p> Please enter gaugelength in mm </p>
-    <%= f.label :gauge_length %><br>
-    <%= f.number_field :gauge_length %>
+  <div class="col-lg-3">
+    <div class="field">
+      <p> Please enter gaugelength in mm </p>
+      <%= f.label :gauge_length %><br>
+      <%= f.number_field :gauge_length %>
+    </div>
   </div>
   <div class="actions">
     <%= f.submit "Next Step" %>
